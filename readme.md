@@ -1,22 +1,23 @@
-Net-chan Discord Bot
-====================
+# Net-chan Discord Bot
+
 <img src="images/net-chan.png" alt="Net-chan" width="300">
 
+My homelab has been a bit scattered, and I had been getting notifications from Discord, email, and text from different sources with updates. I wanted a Discord bot to handle all of my notifications.  
 
-Net-chan is a Discord bot designed to interact with users in a friendly and engaging way. It can respond to messages, generate artwork, send affirmations, and integrate with a Flask web server for additional functionality.
+Previously, I had flavored my bot as a servo-skull from 40k, but that got stale. I've been listening to uwu-underground and appreciating their style, so I decided to ask ChatGPT for a cute anime server girl I could give a personality. That makes the messages a lot more fun to receive!  
 
-Features
---------
+Her personality is **cute, stubborn, and proud of herself**. After I finished with the homelab updates, I worked on some commands to expand her personality and make it so I could interact with her.  
 
--   Responds to user commands with cheerful messages
+I relied more heavily on ChatGPT than I have on other projects since I was mostly playing around and having fun, but I think I picked up enough from tweaking and reading the docs to build other simple bots. It's a bit scattered, so I'd appreciate any advice or update ideas!
 
--   Sends daily affirmations at random intervals
+## Features
 
--   Generates AI-powered artwork
+- Responds to webhook events like `update`, `sync`, `backup`, `unraid`, and `failure` from scripts on my network.
+- Personalizes webhook events and shares them in the Discord chat.
+- Responds to Discord webhook updates (for those I haven’t integrated into her yet) and makes snarky responses about how she could make them cuter.
+- Responds to a few basic commands with response banks to add personality and variety.
+- Can make API requests to HuggingFace to generate cute art.
 
--   Responds to webhooks from a homelab server
-
--   Greets users when it becomes active
 
 Installation
 ------------
