@@ -6,19 +6,22 @@ import asyncio
 from threading import Thread
 from dotenv import load_dotenv
 from responses import get_response
+from datetime import datetime, timedelta
+import random
+
 
 load_dotenv()
 
 #Hidden Variables
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
-UNRAID_ID = int(os.getenv("UNRAID_ID"))
 AFFIRM_ID = int(os.getenv("AFFIRM_ID"))
 
 # Global Variable
 last_response_time = None
 
 intents = discord.Intents.default()
+intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 #bot jobs
@@ -26,25 +29,40 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 async def on_ready():
     print(f"(*￣▽￣)~zzz... Huh? Net-chan is waking up... ☀️ *rubs eyes* Logged in as {bot.user}... Do I *have* to get up? (๑-﹏-๑)💤")
 
-@bot.event  # bot responds to Unraid webhook (maxed at once a minute)
+@bot.event  # bot responds to the webhook (maxed at once a minute)
 async def on_message(message):
     global last_response_time
+
+    # Skip the bot's own messages
     if message.author == bot.user:
         return
-    
-    if message.channel.id == UNRAID_ID:
+
+    # Allow the bot to process commands (such as the pet command) **before** applying custom logic
+    await bot.process_commands(message)
+
+    # Handle messages from the webhook user with rate-limiting logic
+    webhook_user_id = 1342347016168280075
+
+    if message.channel.id == CHANNEL_ID and message.author.id == webhook_user_id:
         current_time = asyncio.get_event_loop().time()
+
         if last_response_time and current_time - last_response_time < 60:
-            return
+            return  # Don't reply if less than 60 seconds have passed
         else:
             await asyncio.sleep(3)
             reply = get_response("unraid", "") 
             if message.channel:
                 await message.channel.send(reply)
             last_response_time = current_time
-    
-    await bot.process_commands(message)
 
+
+
+# bot commands
+@bot.command()
+async def pet(ctx):
+    await ctx.send("Net-chan purrs and says thank you for the love! (｡♥‿♥｡)")
+
+#monitoring
 async def send_positive_messages(): #daily affirmations that are cute
     await bot.wait_until_ready()
     channel = bot.get_channel(AFFIRM_ID)
@@ -91,7 +109,8 @@ def webhook():
 
 
 def run_flask():
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000, debug=False)
+
 
 #Wake up, Net-chan!
 if __name__ == "__main__":
