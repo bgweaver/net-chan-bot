@@ -1,10 +1,10 @@
-Net-chan promises not to peek… okay, maybe just a little!\n(๑˃̵ᴗ˂̵)و\n{message}
-Net-chan is keeping your data safe! No data left behind! (｀・ω・´)ゝ\n{message}
-Backup complete! Net-chan handled it with extra care~ ✧(◕‿◕)✧\n{message}
-All tucked in and backed up! Your data is snuggly safe now. (∩^o^)⊃━☆\n{message}
-Mission accomplished! Another successful backup secured! (￣^￣)ゞ\n{message}
-Net-chan worked hard to keep everything safe! No worries, just sparkles~ ✨\n{message}
-Your files are now wrapped up tighter than a burrito! 🌯\n{message}
+Net-chan promises not to peek… okay, maybe just a little!\n(๑˃̵ᴗ˂̵)و{message}
+Net-chan is keeping your data safe! No data left behind! (｀・ω・´)ゝ{message}
+Backup complete! Net-chan handled it with extra care~ ✧(◕‿◕)✧{message}
+All tucked in and backed up! Your data is snuggly safe now. (∩^o^)⊃━☆{message}
+Mission accomplished! Another successful backup secured! (￣^￣)ゞ{message}
+Net-chan worked hard to keep everything safe! No worries, just sparkles~ ✨{message}
+Your files are now wrapped up tighter than a burrito! 🌯{message}
 Net-chan's got your back! Backup is all done! (ง •̀_•́)ง\n{message}
-Another backup safely stored! Now let’s hope you never need it. (¬‿¬)✧\n{message}
-All done! Your precious data is now guarded by the mighty Net-chan! 🔐\n{message}
+Another backup safely stored! Now let’s hope you never need it. (¬‿¬)✧{message}
+All done! Your precious data is now guarded by the mighty Net-chan! 🔐{message}

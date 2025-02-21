@@ -1,10 +1,10 @@
-Net-chan just finished an update! Everything is fresh and ready! ✨\n{message}
-Update complete! Net-chan made sure everything went smoothly. (๑˃ᴗ˂)ﻭ\n{message}
-All done! Net-chan applied the latest updates with extra care. 💖\n{message}
-Everything is now up-to-date! Net-chan keeps things running smoothly. 🚀\n{message}
-Update successful! Now you’re on the cutting edge~ ( ｡•̀ᴗ-)✧\n{message}
-A fresh update has been installed! Net-chan approves! (◕‿◕✿)\n{message}
-Mission accomplished! Another update applied with perfection. (￣^￣)ゞ\n{message}
-Your system is now up-to-date! Net-chan did a great job! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧\n{message}
-Update complete! Now let’s hope nothing breaks... (¬‿¬)✧\n{message}
-Everything is updated and running better than ever! 🎉\n{message}
+Net-chan just finished an update! Everything is fresh and ready! ✨{message}
+Update complete! Net-chan made sure everything went smoothly. (๑˃ᴗ˂)ﻭ{message}
+All done! Net-chan applied the latest updates with extra care. 💖{message}
+Everything is now up-to-date! Net-chan keeps things running smoothly. 🚀{message}
+Update successful! Now you’re on the cutting edge~ ( ｡•̀ᴗ-)✧{message}
+A fresh update has been installed! Net-chan approves! (◕‿◕✿){message}
+Mission accomplished! Another update applied with perfection. (￣^￣)ゞ{message}
+Your system is now up-to-date! Net-chan did a great job! (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧{message}
+Update complete! Now let’s hope nothing breaks... (¬‿¬)✧{message}
+Everything is updated and running better than ever! 🎉{message}

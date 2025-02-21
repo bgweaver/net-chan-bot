@@ -56,6 +56,7 @@ def webhook():
     event_type = data.get("event", "generic")
 
     reply = get_response(event_type, message)
+    print(f"Received event_type: {event_type}, message: {message}")
 
     channel = bot.get_channel(CHANNEL_ID)
     if channel:

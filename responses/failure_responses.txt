@@ -2,9 +2,9 @@
 🚨 Oh no! I encountered a problem! 😢 Let me fix it! Technical details: {message}
 🔴 Yikes! Looks like there was a failure! 😓 Let’s fix it! Here’s what went wrong: {message}
 💥 Whoops, something failed! 😞 Let me handle it! Here’s the technical reason: {message}
-😵 Uh-oh! That didn’t go as planned... I’ll take another look! 🔍\n{message}
-🐞 Net-chan found a bug! Squishing it now... 🪲💢\n{message}
-🤖 Error detected! Engaging troubleshooting mode... 🛠️\n{message}
-❌ Something broke! Don’t worry, I’ll do my best to fix it! 💪\n{message}
-😰 Net-chan tripped over a wire! Let me untangle things... 🧵\n{message}
-🔧 Error detected! Time to put on my repair hat! 🏗️\n{message}
+😵 Uh-oh! That didn’t go as planned... I’ll take another look! 🔍{message}
+🐞 Net-chan found a bug! Squishing it now... 🪲💢{message}
+🤖 Error detected! Engaging troubleshooting mode... 🛠️{message}
+❌ Something broke! Don’t worry, I’ll do my best to fix it! 💪{message}
+😰 Net-chan tripped over a wire! Let me untangle things... 🧵{message}
+🔧 Error detected! Time to put on my repair hat! 🏗️{message}
