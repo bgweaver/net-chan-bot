@@ -5,12 +5,14 @@ from flask import Flask, request
 import asyncio
 from threading import Thread
 from dotenv import load_dotenv
-from responses import get_response
+from responses import get_response, generate_art_prompt, load_last_art_time, save_last_art_time, load_last_wake_time, save_last_wake_time
+from responses import generate_art_prompt
 from datetime import datetime, timedelta
 import random
 import requests
 import io
 from PIL import Image
+import json
 
 
 load_dotenv()
@@ -25,26 +27,41 @@ AFFIRM_ID = int(os.getenv("AFFIRM_ID"))
 last_response_time = None
 last_response_time_lock = asyncio.Lock()
 
+last_wake_message_time = None
+wake_message_lock = asyncio.Lock()
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-@bot.event
-async def on_ready():
-    print(f"Net-chan is ready! Logged in as {bot.user}")
-    
-    channel = bot.get_channel(CHANNEL_ID)
-    
-    if channel:
-        # Send a message along with an image (URL)
-        wake_message = get_response("wake", "")
-        await channel.send(
-            wake_message,
-            file=discord.File('./images/net-chan.png')  # Use the correct path to your image
-        )
-    else:
-        print("Channel not found!")
 
+@bot.event
+async def on_ready(): 
+    global last_wake_message_time
+    print(f"Net-chan is ready! Logged in as {bot.user}")
+
+    # Load the last wake message time
+    load_last_wake_time()
+
+    current_time = datetime.now()
+
+    # Check if it's been more than an hour since the last wake message
+    if last_wake_message_time is None or (current_time - last_wake_message_time) > timedelta(hours=1):
+        channel = bot.get_channel(CHANNEL_ID)
+        
+        if channel:
+            wake_message = get_response("wake", "")
+            await channel.send(
+                wake_message,
+                file=discord.File('./images/net-chan.png')
+            )
+            # Update the last wake message time and save it
+            last_wake_message_time = current_time
+            save_last_wake_time()
+        else:
+            print("Channel not found!")
+    else:
+        print("Wake message was sent too recently, skipping.")
 
 
 @bot.event  # bot responds to the unfiltered webhook (maxed at once a minute)
@@ -64,7 +81,7 @@ async def on_message(message):
         if last_response_time and current_time - last_response_time < 60:
             return
         else:
-            await asyncio.sleep(3)
+            await asyncio.sleep(2)
             reply = get_response("unraid", "") 
             if message.channel:
                 await message.channel.send(reply)
@@ -81,8 +98,8 @@ async def commands(ctx):
     help_message = """
     Hehe~! (*≧ω≦) Here are the things I can do for you~! (*^ω^*)
 
-    ✨ `!commands` - Aww, you wanna know what I can do? Here's all my little tricks! (｡•̀ᴗ•́｡)✨
-    ✨ `!pat` - W-Wait, don't do that! I'm working! (｡•̀︿•́｡) But... maybe just a little pat... for being so sweet? (//∇//) 
+    ✨ `!commands` - Here's all my little tricks! (｡•̀ᴗ•́｡)✨
+    ✨ `!pat` - W-Wait, don't do that! I'm working! (｡•̀︿•́｡)
     ✨ `!cheer` - Need a little pick-me-up? I'll send you a cute and affirming message! (｡♥‿♥｡)
     ✨ `!art` - I can draw something just for you~! Maybe something sparkly? (｡•́︿•̀｡)✨
     ✨ `!info` - Wanna know more about me? (´｡• ᵕ •｡`) I’d love to share~! (*´ω`*)
@@ -94,7 +111,9 @@ async def commands(ctx):
 
 @bot.command()
 async def pat(ctx):
-    await ctx.send("W-What do you think you're doing...! (｡•̀︿•́｡) J-just a headpat, huh?... F-fine, I guess I appreciate it... (//∇//) *looks away*")
+    pat_reply = get_response("pat","")
+    await ctx.send(pat_reply)
+
 
 @bot.command()
 async def info(ctx):
@@ -118,31 +137,27 @@ async def cheer(ctx):
 
 @bot.command()
 async def art(ctx):
+    # Get the last art time
+    last_art_time = load_last_art_time()
+
+    # Check if the art command was used less than 12 hours ago
+    if last_art_time and datetime.now() - last_art_time < timedelta(hours=12):
+        await ctx.send("I'm too tired to make more art right now... I'm busy with other things. Maybe later? (｡•́︿•̀｡)")
+        return
+
     hf_api = os.getenv('HUGGING_FACE_API')
+    prompt = generate_art_prompt()
+    print(prompt)
+
     try:
-        # API request to Hugging Face
         API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
-        headers = {"Authorization": f"Bearer {hf_api}"}  # Using the API token from env var
+        headers = {"Authorization": f"Bearer {hf_api}"}
 
-        def query(payload):
-            response = requests.post(API_URL, headers=headers, json=payload)
-            return response
+        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
 
-        # Request the image (description is customizable)
-        response = query({
-            "inputs": "something super cute that will make me say 'awwww, kawaii!'",
-        })
-
-        # Ensure the response was successful
+        # Return early if the response is not successful
         if response.status_code != 200:
-            await ctx.send("Oops, there was an issue fetching the art from Hugging Face.")
-            return
-
-        # Check if the content is an image (content type header)
-        if 'image' not in response.headers['Content-Type']:
-            print("Received non-image data:")
-            print(response.content)  # Log raw content for inspection
-            await ctx.send("Oops, something went wrong with the art generation. Please try again later.")
+            await ctx.send("Oopsie, there was an issue fetching the art... (｡•́︿•̀｡)")
             return
 
         # Open the image using PIL
@@ -155,6 +170,9 @@ async def art(ctx):
 
             # Send the image to Discord
             await ctx.send("Here's your cute art! (｡♥‿♥｡)", file=discord.File(image_file, filename="cute_art.png"))
+
+        # Save the timestamp for when the art was last generated
+        save_last_art_time()
 
     except Exception as e:
         await ctx.send("I don't feel like doing art right now... 😔")

@@ -1,4 +1,5 @@
 .env
+.delays/
 
 __pycache__/
 *.pyc
