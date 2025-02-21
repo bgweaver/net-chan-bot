@@ -1,6 +1,7 @@
 Net-chan Discord Bot
 ====================
-![Net-chan](images/net-chan.png)
+<img src="images/net-chan.png" alt="Net-chan" width="300">
+
 
 Net-chan is a Discord bot designed to interact with users in a friendly and engaging way. It can respond to messages, generate artwork, send affirmations, and integrate with a Flask web server for additional functionality.
 
