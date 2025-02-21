@@ -18,6 +18,8 @@ def get_response(event_type, message):
         responses = load_responses('./responses/failure_responses.txt')
     elif event_type == "affirmations":
         responses = load_responses('./responses/affirmations.txt')
+    elif event_type == "wake":
+        responses = load_responses('./responses/wake_up.txt')    
     else:
         responses = ["🌸 **Net-chan Update!** 🌸" + message]
 
