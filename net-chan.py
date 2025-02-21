@@ -13,6 +13,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 UNRAID_ID = int(os.getenv("UNRAID_ID"))
+AFFIRM_ID = int(os.getenv("AFFIRM_ID"))
 
 # Global Variable
 last_response_time = None
@@ -20,7 +21,7 @@ last_response_time = None
 intents = discord.Intents.default()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-#bot events
+#bot jobs
 @bot.event #bot started
 async def on_ready():
     print(f"(*￣▽￣)~zzz... Huh? Net-chan is waking up... ☀️ *rubs eyes* Logged in as {bot.user}... Do I *have* to get up? (๑-﹏-๑)💤")
@@ -44,6 +45,30 @@ async def on_message(message):
     
     await bot.process_commands(message)
 
+async def send_positive_messages(): #daily affirmations that are cute
+    await bot.wait_until_ready()
+    channel = bot.get_channel(AFFIRM_ID)
+    
+    while not bot.is_closed():
+
+        now = datetime.now()
+        
+        daytime_start = now.replace(hour=8, minute=0, second=0, microsecond=0)
+        daytime_end = now.replace(hour=20, minute=0, second=0, microsecond=0)
+        
+        if daytime_start <= now <= daytime_end:
+
+            wait_time = random.randint(0, (daytime_end - now).seconds) 
+            await asyncio.sleep(wait_time)
+            
+            if channel:
+                positive_message = get_response("affirmations", "")
+                await channel.send(positive_message)
+            await asyncio.sleep(random.randint(6 * 3600, 12 * 3600))  
+
+        else:
+            wait_for_daytime = (daytime_start - now).seconds if now < daytime_start else (daytime_start + timedelta(days=1) - now).seconds
+            await asyncio.sleep(wait_for_daytime) 
 
 #Flask
 app = Flask(__name__)

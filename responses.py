@@ -16,6 +16,8 @@ def get_response(event_type, message):
         responses = load_responses('./responses/unraid_responses.txt')
     elif event_type == "failed":
         responses = load_responses('./responses/failure_responses.txt')
+    elif event_type == "affirmations":
+        responses = load_responses('./responses/affirmations.txt')
     else:
         responses = ["🌸 **Net-chan Update!** 🌸" + message]
 
