@@ -40,28 +40,22 @@ async def on_ready():
     global last_wake_message_time
     print(f"Net-chan is ready! Logged in as {bot.user}")
 
-    # Load the last wake message time
     load_last_wake_time()
 
-    current_time = datetime.now()
+    bot.loop.create_task(send_positive_messages())
 
-    # Check if it's been more than an hour since the last wake message
+    current_time = datetime.now()
     if last_wake_message_time is None or (current_time - last_wake_message_time) > timedelta(hours=1):
         channel = bot.get_channel(CHANNEL_ID)
-        
         if channel:
             wake_message = get_response("wake", "")
             await channel.send(
                 wake_message,
                 file=discord.File('./images/net-chan.png')
             )
-            # Update the last wake message time and save it
             last_wake_message_time = current_time
             save_last_wake_time()
-        else:
-            print("Channel not found!")
-    else:
-        print("Wake message was sent too recently, skipping.")
+
 
 
 @bot.event  # bot responds to the unfiltered webhook (maxed at once a minute)
@@ -137,10 +131,8 @@ async def cheer(ctx):
 
 @bot.command()
 async def art(ctx):
-    # Get the last art time
     last_art_time = load_last_art_time()
 
-    # Check if the art command was used less than 12 hours ago
     if last_art_time and datetime.now() - last_art_time < timedelta(hours=12):
         await ctx.send("I'm too tired to make more art right now... I'm busy with other things. Maybe later? (｡•́︿•̀｡)")
         return
@@ -155,23 +147,18 @@ async def art(ctx):
 
         response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
 
-        # Return early if the response is not successful
         if response.status_code != 200:
             await ctx.send("Oopsie, there was an issue fetching the art... (｡•́︿•̀｡)")
             return
 
-        # Open the image using PIL
         image = Image.open(io.BytesIO(response.content))
 
-        # Save the image to an in-memory file to send in Discord
         with io.BytesIO() as image_file:
             image.save(image_file, format="PNG")
-            image_file.seek(0)  # Go to the beginning of the file
+            image_file.seek(0) 
 
-            # Send the image to Discord
             await ctx.send("Here's your cute art! (｡♥‿♥｡)", file=discord.File(image_file, filename="cute_art.png"))
 
-        # Save the timestamp for when the art was last generated
         save_last_art_time()
 
     except Exception as e:
