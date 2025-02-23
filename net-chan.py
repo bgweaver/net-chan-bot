@@ -169,24 +169,24 @@ async def commands(ctx):
     ✨ `!info` - Wanna know more about me? (´｡• ᵕ •｡`) I’d love to share~! (*´ω`*)
     I’m always here for you, so let me know if you need anything else! (´∩｡• ᵕ •｡∩`)✨
     """
-    await ctx.send(help_message, file=discord.File('./images/net-chan.png'))
-
+    await ctx.send(help_message)
+    
 @bot.command()
 async def pat(ctx):
     pat_reply = get_response("pat", "")
-    await ctx.send(pat_reply)
     await ctx.send(pat_reply, file=discord.File('./images/net-chan-embarassed.png'))
 
 @bot.command()
 async def info(ctx):
-    await ctx.send("""
+    command_message = """
     Hehe~! (*≧ω≦) Let me tell you a bit about myself! (｡•̀ᴗ•́｡)✨
     ✨ I'm Net-chan, your friendly server bot! ✨
     My main job is to send you updates about your homelab environment. I share and respond to server webhooks, and I notify you when certain scripts have run, but I'm learning to do more every day, whether it's answering questions, giving you updates, or just being super cute~! (*^ω^*)
     ✨ I absolutely love sparkles, blinking lights, and bright colors! (｡♥‿♥｡) So if you see me getting excited, it’s probably because something sparkly is happening~! (๑•́⌓•̀๑)
     ✨ If you ever need anything, just type `!commands` and I'll be right here, ready to brighten your day! (｡•̀ᴗ•́｡)✨
     ✨ And if you’re feeling down, don’t worry—I'll be here to cheer you up with my sparkly energy! (灬º‿º灬)♡
-    """)
+    """
+    await ctx.send(command_message, file=discord.File('./images/net-chan.png'))
 
 @bot.command()
 async def cheer(ctx):
