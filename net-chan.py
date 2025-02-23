@@ -36,9 +36,12 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Response Handling
 def load_responses(file_name):
-    with open(file_name, 'r') as file:
-        responses = file.readlines()
-    return [response.strip() for response in responses]
+    if file_name:
+        with open(file_name, 'r', encoding="utf-8") as file:
+            responses = file.readlines()
+        return [response.strip() for response in responses]
+    else:
+        return ["🌸 **Net-chan Update!** 🌸"]
 
 def get_response(event_type, message):
     response_files = {
@@ -49,9 +52,11 @@ def get_response(event_type, message):
         "failed": './responses/failure_responses.txt',
         "affirmations": './responses/affirmations.txt',
         "wake": './responses/wake_up.txt',
-        "pat": './responses/pats.txt'
+        "pat": './responses/pats.txt',
+        "fire": './responses/fire.txt',
+        "kuma": './responses/kuma.txt',
     }
-    responses = load_responses(response_files.get(event_type, './responses/update_responses.txt'))
+    responses = load_responses(response_files.get(event_type, ''))
     response = random.choice(responses)
     if '{message}' in response:
         response = response.format(message=f"\n\n({message})")
@@ -148,9 +153,17 @@ async def on_message(message):
             return
         else:
             await asyncio.sleep(2)
-            reply = get_response("unraid", "")
+
+            if "error" in message.content.lower() or "down" in message.content.lower() or "errors" in message.content.lower():
+                reply = get_response("fire", "")
+            elif "up" in message.content.lower():
+                reply = get_response("kuma", "")
+            else:
+                reply = get_response("unraid", "")
+
             if message.channel:
                 await message.channel.send(reply)
+
             last_response_time = current_time
 
 @bot.event
@@ -161,13 +174,15 @@ async def on_disconnect():
 @bot.command()
 async def commands(ctx):
     help_message = """
-    Hehe~! (*≧ω≦) Here are the things I can do for you~! (*^ω^*)
-    ✨ `!commands` - Here's all my little tricks! (｡•̀ᴗ•́｡)✨
-    ✨ `!pat` - W-Wait, don't do that! I'm working! (｡•̀︿•́｡)
-    ✨ `!cheer` - Need a little pick-me-up? I'll send you a cute and affirming message! (｡♥‿♥｡)
-    ✨ `!art` - I can draw something just for you~! Maybe something sparkly? (｡•́︿•̀｡)✨
-    ✨ `!info` - Wanna know more about me? (´｡• ᵕ •｡`) I’d love to share~! (*´ω`*)
-    I’m always here for you, so let me know if you need anything else! (´∩｡• ᵕ •｡∩`)✨
+    Here are the things I can do for you~! (*^ω^*)
+    ✨ `!commands` - This message!(*≧ω≦)
+    ✨ `!pat` - Hey, I'm working! (｡•̀︿•́｡)
+    ✨ `!cheer` - I'll cheer you on! (｡♥‿♥｡)
+    ✨ `!art` - I'll make a cute picture! (*´ω`*)
+    ✨ `!info` - Learn more about me! (◕‿◕✿) 
+
+    I’m always here for you, so let me know if you need anything else!
+    (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
     """
     await ctx.send(help_message)
     
@@ -179,12 +194,18 @@ async def pat(ctx):
 @bot.command()
 async def info(ctx):
     command_message = """
-    Hehe~! (*≧ω≦) Let me tell you a bit about myself! (｡•̀ᴗ•́｡)✨
+    Hehe~! (*≧ω≦) 
+    Let me tell you a bit about myself! (｡•̀ᴗ•́｡)
+
     ✨ I'm Net-chan, your friendly server bot! ✨
+    
     My main job is to send you updates about your homelab environment. I share and respond to server webhooks, and I notify you when certain scripts have run, but I'm learning to do more every day, whether it's answering questions, giving you updates, or just being super cute~! (*^ω^*)
-    ✨ I absolutely love sparkles, blinking lights, and bright colors! (｡♥‿♥｡) So if you see me getting excited, it’s probably because something sparkly is happening~! (๑•́⌓•̀๑)
-    ✨ If you ever need anything, just type `!commands` and I'll be right here, ready to brighten your day! (｡•̀ᴗ•́｡)✨
-    ✨ And if you’re feeling down, don’t worry—I'll be here to cheer you up with my sparkly energy! (灬º‿º灬)♡
+    
+    I absolutely love sparkles, blinking lights, and bright colors! (｡♥‿♥｡) So if you see me getting excited, it’s probably because something sparkly is happening~! (๑•́⌓•̀๑)
+    
+    If you ever need anything, just type `!commands` and I'll be right here, ready to brighten your day! (｡•̀ᴗ•́｡)
+    
+    And if you’re feeling down, don’t worry—I'll be here to cheer you up with my sparkly energy! (灬º‿º灬)♡
     """
     await ctx.send(command_message, file=discord.File('./images/net-chan.png'))
 
