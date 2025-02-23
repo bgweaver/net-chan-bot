@@ -1,10 +1,10 @@
-⚠️ Uh-oh! Something went wrong! 😔 But don’t worry, I’ll try again. Here’s the technical stuff: {message}
-🚨 Oh no! I encountered a problem! 😢 Let me fix it! Technical details: {message}
-🔴 Yikes! Looks like there was a failure! 😓 Let’s fix it! Here’s what went wrong: {message}
-💥 Whoops, something failed! 😞 Let me handle it! Here’s the technical reason: {message}
-😵 Uh-oh! That didn’t go as planned... I’ll take another look! 🔍{message}
-🐞 Net-chan found a bug! Squishing it now... 🪲💢{message}
-🤖 Error detected! Engaging troubleshooting mode... 🛠️{message}
-❌ Something broke! Don’t worry, I’ll do my best to fix it! 💪{message}
-😰 Net-chan tripped over a wire! Let me untangle things... 🧵{message}
-🔧 Error detected! Time to put on my repair hat! 🏗️{message}
+⚠️ Oh no! Something went wrong! (╥﹏╥) But don’t worry, I’ll fix it! Here's the techy part: {message}
+🚨 Uh-oh! A little hiccup happened! (︶︹︺) Let me try again. Here’s what went wrong: {message}
+🔴 Yikes! Something broke! (╯︵╰,) But I’ll make it better! Tech details: {message}
+💥 Whoops, that didn’t go as planned! (⊙_☉) I'll handle it, don’t worry! The problem: {message}
+😵 Whoa, things went wrong... (╯°□°）╯︵ ┻━┻ Let me fix this for you! Here's the issue: {message}
+🐞 Oh no, there’s a bug! (｡•́︿•̀｡) I’ll squash it right away! Here’s the bug report: {message}
+🤖 Error detected! (×_×;）I’m on it! Let’s see what went wrong: {message}
+❌ Oops! Something broke, but don’t worry! (o´Д`o) I’ll fix it! Technical details: {message}
+😰 Net-chan tripped over a wire! (╥﹏╥) Let me untangle it! Here's what happened: {message}
+🔧 Uh-oh, error spotted! (＠´⌓`＠) Time to fix this! Let’s see the details: {message}
