@@ -137,6 +137,8 @@ async def on_ready():
                 save_last_wake_time()
                 print(f"Sent wake message and updated last_wake_message_time to: {last_wake_message_time}")
 
+import re
+
 @bot.event
 async def on_message(message):
     global last_response_time
@@ -147,24 +149,48 @@ async def on_message(message):
     await bot.process_commands(message)
 
     webhook_user_id = int(os.getenv("WEBHOOK_BOT_ID"))
+
     if message.channel.id == CHANNEL_ID and message.author.id == webhook_user_id:
         current_time = asyncio.get_event_loop().time()
+
         if last_response_time and current_time - last_response_time < 60:
             return
         else:
             await asyncio.sleep(2)
 
-            if "error" in message.content.lower() or "down" in message.content.lower() or "errors" in message.content.lower():
-                reply = get_response("fire", "")
-            elif "up" in message.content.lower():
-                reply = get_response("kuma", "")
+            print(f"Message author: {message.author}")
+            print(f"Message content: {message.content}")
+            print(f"Message embeds: {message.embeds}")
+
+            if message.embeds:
+                embed = message.embeds[0]
+                embed_title = embed.title.lower() if embed.title else ""
+
+                print(f"Embed title: {embed_title}")
+
+                if "up" in embed_title:
+                    reply = get_response("kuma", "")
+                elif "down" in embed_title:
+                    reply = get_response("fire", "")
+                else:
+                    reply = get_response("unraid", "")
+
             else:
-                reply = get_response("unraid", "")
+                message_content = message.content.strip().lower()
+                print(f"Message content after cleaning: {message_content}")
+
+                if any(keyword in message_content for keyword in ['error', 'down', 'errors']):
+                    reply = get_response("fire", "")
+                elif 'up' in message_content:
+                    reply = get_response("kuma", "")
+                else:
+                    reply = get_response("unraid", "")
 
             if message.channel:
                 await message.channel.send(reply)
 
             last_response_time = current_time
+
 
 @bot.event
 async def on_disconnect():
