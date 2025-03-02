@@ -74,7 +74,7 @@ def generate_art_prompt():
     adjective = random.choice(cute_adjectives)
     noun = random.choice(cute_nouns)
     object_ = random.choice(cute_objects)
-    return f"a {adjective} {noun} with a {object_}"
+    return f"a {adjective} {noun} with a {object_} in a very kawaii style"
 
 # Delay Handling
 def load_delay_time(file_path):
@@ -281,6 +281,7 @@ async def pat(ctx):
 
     if praise_counter == 0:
         pat_reply = get_response("pat_annoyed", "")
+        pat_image = './images/net-chan-angry.png'
         embed_color = discord.Color.red()
     else:
         pat_reply = get_response("pat", "")
