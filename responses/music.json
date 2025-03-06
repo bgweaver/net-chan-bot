@@ -1,0 +1,86 @@
+[
+    {
+        "title": "VX",
+        "artist": "Laughing Mantis",
+        "image": "./images/albums/laughing_mantis.jpg",
+        "link": "https://laughingmantis.bandcamp.com/track/vx"
+    },
+    {
+        "title": "Ransomwave",
+        "artist": "Laughing Mantis",
+        "image": "./images/albums/ransomwave.jpg",
+        "link": "https://laughingmantis.bandcamp.com/track/ransomwave"
+    },
+    {
+        "title": "Snake Oil",
+        "artist": "UwU Underground",
+        "image": "./images/albums/snake_oil.jpg",
+        "link": "https://uwuunderground.bandcamp.com/track/snake-oil"
+    },
+    {
+        "title": "Palo Alto Is Trash",
+        "artist": "UwU Underground",
+        "image": "./images/albums/snake_oil.jpg",
+        "link": "https://uwuunderground.bandcamp.com/track/palo-alto-is-trash"
+    },
+    {
+        "title": "EKUwU",
+        "artist": "UwU Underground",
+        "image": "./images/albums/snake_oil.jpg",
+        "link": "https://uwuunderground.bandcamp.com/track/ekuwu"
+    },
+    {
+        "title": "Junk Runner (Asuka Mix)",
+        "artist": "UwU Underground",
+        "image": "./images/albums/snake_oil.jpg",
+        "link": "https://uwuunderground.bandcamp.com/track/junk-runner-asuka-mix"
+    },
+    {
+        "title": "Human (Cover)",
+        "artist": "UwU Underground",
+        "image": "./images/albums/snake_oil.jpg",
+        "link": "https://uwuunderground.bandcamp.com/track/human-cover-yulia-vs-yuma-dance-mix"
+    },
+    {
+        "title": "Kyouran Hey Kids!!",
+        "artist": "THE ORAL CIGARETTES",
+        "image": "./images/albums/kyouran.jpg",
+        "link": "https://open.spotify.com/track/38kcwx5znepLWCIBID0Bwm"
+    },
+    {
+        "title": "Megitsune",
+        "artist": "BABYMETAL",
+        "image": "./images/albums/baby_metal.jpg",
+        "link": "https://open.spotify.com/track/213fcsbfrn69u0vHnrg1Gl"
+    },
+    {
+        "title": "ERROR",
+        "artist": "GARNiDELiA",
+        "image": "./images/albums/error.jpg",
+        "link": "https://open.spotify.com/track/0fMEMqWYdcFTM5crzpTq9I"
+    },
+    {
+        "title": "No Scared",
+        "artist": "ONE OK ROCK",
+        "image": "./images/albums/black_snow.jpg",
+        "link": "https://open.spotify.com/track/5SIt7sjeHZU9cqo4Re8S9s"
+    },
+    {
+        "title": "Remote Control (Vocaloid Cover)",
+        "artist": "Gumi V4 & Hatsune Miku V4 + Vsqx",
+        "image": "./images/albums/remote_control.jpg",
+        "link": "https://soundcloud.com/sharadelvia/vocaloid-cover-remote-control-rimokon-gumi-v4-hatsune-miku-v4-vsqx"
+    },
+    {
+        "title": "Dirty ROM Dance Mix",
+        "artist": "Nullsleep",
+        "image": "./images/albums/rom.jpg",
+        "link": "https://open.spotify.com/track/7JMPsnTgehOCdnqQWWZ3fR"
+    },
+    {
+        "title": "CONFIG.SYS",
+        "artist": "Master Boot Record",
+        "image": "./images/albums/mbr.jpg",
+        "link": "https://open.spotify.com/track/0gWWHHxdPOGrda1IXGpDoY"
+    }
+]

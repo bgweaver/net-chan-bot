@@ -116,6 +116,12 @@ def save_last_wake_time():
     save_delay_time(WAKE_DELAY_FILE)
     print(f"Saved last_wake_message_time to file.")
 
+# Random Music Collection
+def get_song():
+    with open('./responses/music.json') as f:
+        json_data = json.load(f)
+        return(random.choice(json_data))
+
 # Discord Bot Events
 @bot.event
 async def on_ready():
@@ -135,11 +141,13 @@ async def on_ready():
             channel = bot.get_channel(CHANNEL_ID)
             if channel:
                 wake_message = get_response("wake", "")
-                await channel.send(wake_message, file=discord.File('./images/net-chan-sleepy.png'))
+                embed = discord.Embed(description=wake_message, color=discord.Color.blue())
+                file=discord.File('./images/net-chan-sleepy.png', filename="net-chan-sleepy.png")
+                embed.set_image(url="attachment://net-chan-sleepy.png")
+                await channel.send(embed=embed, file=file)
                 last_wake_message_time = current_time
                 save_last_wake_time()
                 print(f"Sent wake message and updated last_wake_message_time to: {last_wake_message_time}")
-
 
 @bot.event
 async def on_message(message):
@@ -157,18 +165,30 @@ async def on_message(message):
         current_time = asyncio.get_event_loop().time()
 
         if last_response_time and current_time - last_response_time < 60:
-            return  # Wait before replying again
+            return 
 
-        last_response_time = current_time  # Update last response time
+        last_response_time = current_time 
 
-        # Pause before sending a reply to avoid spam
         await asyncio.sleep(2)
 
         print(f"Message author: {message.author}")
         print(f"Message content: {message.content}")
         print(f"Message embeds: {message.embeds}")
+        
+        for embed in message.embeds:
+            print(f"Embed title: {embed.title if embed.title else 'No title'}")
+            print(f"Embed description: {embed.description if embed.description else 'No description'}")
+            print(f"Embed URL: {embed.url if embed.url else 'No URL'}")
+            print(f"Embed color: {embed.color if embed.color else 'No color'}")
+            print(f"Embed footer: {embed.footer.text if embed.footer else 'No footer'}")
+            print(f"Embed author: {embed.author.name if embed.author else 'No author'}")
+            print(f"Embed timestamp: {embed.timestamp if embed.timestamp else 'No timestamp'}")
+        
+        for field in embed.fields:
+            print(f"Field Name: {field.name}, Value: {field.value}")
 
-        if message.embeds:  # Check if the message has an embed
+
+        if message.embeds: 
             embed = message.embeds[0]
             embed_title = embed.title.lower() if embed.title else ""
 
@@ -185,7 +205,7 @@ async def on_message(message):
             else:
                 reply = get_response("unraid", "")
                 color = discord.Color.purple()
-        else:  # If no embed, handle the message content instead
+        else:
             message_content = message.content.strip().lower()
             print(f"Message content after cleaning: {message_content}")
 
@@ -198,8 +218,6 @@ async def on_message(message):
             else:
                 reply = get_response("unraid", "")
                 color = discord.Color.purple()
-
-        # Send the embed with the message
         if reply:
             embed = discord.Embed(description=reply, color=color)
             await message.channel.send(embed=embed)
@@ -246,13 +264,15 @@ class CustomHelpCommand(commands.HelpCommand):
         embed = discord.Embed(title="Net-chan Help", description="Here are the things I can do~! (*^ω^*):")
         
         command_list = (
-            "✨ `!help` - Shows this help message. (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧\n"
-            "✨ `!info` - Learn more about me! (◕‿◕✿)\n"
-            "✨ `!log` - Check the server event logs! ʕ•ᴥ•ʔ\n"
-            "✨ `!art` - I'll make a cute picture! (◠﹏◠✿)\n"
-            "✨ `!cheer` - I'll cheer you on! (｡♥‿♥｡)\n"
-            "✨ `!pat` - Hey, I'm working! (｡•̀︿•́｡)\n"
-        )
+    "✨ `!help` - Shows this help message. (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧\n"
+    "✨ `!info` - Learn more about me! (◕‿◕✿)\n"
+    "✨ `!log` - Check the server event logs! ʕ•ᴥ•ʔ\n"
+    "✨ `!art` - I'll make a cute picture! (◠﹏◠✿)\n"
+    "✨ `!cheer` - I'll cheer you on! (｡♥‿♥｡)\n"
+    "✨ `!pat` - Hey, I'm working! (｡•̀︿•́｡)\n"
+    "✨ `!music` - See what Net-chan's playing right now! (｡♥‿♥｡) 🎶"
+)
+
         
         embed.add_field(name="Commands:", value=command_list, inline=False)
         
@@ -407,6 +427,22 @@ async def art(ctx):
         await working_message.edit(embed=error_embed)
         print(f"Error occurred: {e}")
 
+@bot.command()
+async def music(ctx):
+    song = get_song()
+    song_messages = [
+    f"Nyaa~! (≧◡≦) Net-chan is listening to {song.get('title')} by {song.get('artist')}! 🎶✨ It's so fun, it makes me wanna dance! (✿◕‿◕)💾🎵 Will you listen too, pwease? (๑•́‧̫•̀๑) 👉 {song.get('link')}",
+    f"U-uhm... (⁄ ⁄•⁄ω⁄•⁄ ⁄) Net-chan found a really nice song... it's {song.get('title')} by {song.get('artist')}! 🎶💜 It makes me feel all warm inside~ (*≧ω≦)✨ M-maybe you can listen too...? I-if you want to... 👉 {song.get('link')} 💕",
+    f"Waah~! (ﾉ´ヮ`)ﾉ*:･ﾟ✧ {song.get('title')} by {song.get('artist')} is soooo good!! 🎶💾 My circuits are all tingly~! (๑>ᴗ<๑) Heehee~ will you listen with me, pwease? (✿˶˘ ᴗ ˘˶)💜👉 {song.get('link')}",
+    f"Heehee~! (✿◕‿◕) Net-chan found a super cool song—it's {song.get('title')} by {song.get('artist')}! 🎶💾 I feel so happy when I listen to it~!! (๑˃̵ᴗ˂̵)✨ Wanna listen with me, bestie? (｡♥‿♥｡) 👉 {song.get('link')}",
+    f"Uwu~! Net-chan's circuits are vibing to {song.get('title')} by {song.get('artist')}! ⚡🎶 You should totally listen too, nya~! 💾💜 Clicky-click here! 👉 {song.get('link')}"
+]
+    song_message = random.choice(song_messages)
+
+    embed = discord.Embed(description=song_message, color=discord.Color.blue())
+    file = discord.File(song.get('image'), filename="album_cover.jpg")
+    embed.set_image(url="attachment://album_cover.jpg")
+    await ctx.send(embed=embed, file=file)
 
 # Flask Webhook Handling
 app = Flask(__name__)
@@ -418,12 +454,20 @@ def webhook():
     message = data.get("message", "No details provided.")
     event_type = data.get("event", "generic")
     reply = get_response(event_type, message)
+
     print(f"Received event_type: {event_type}, message: {message}")
     webhook_log.append({message})
+
     channel = bot.get_channel(CHANNEL_ID)
     if channel:
-        asyncio.run_coroutine_threadsafe(channel.send(reply), bot.loop)
+        embed = discord.Embed(description=reply, color=discord.Color.blue())
+        embed.add_field(name="Event Type", value=event_type, inline=False)
+        embed.add_field(name="Message", value=message, inline=False)
+
+        asyncio.run_coroutine_threadsafe(channel.send(embed=embed), bot.loop)
+
     return {"status": "ok"}
+
 
 def run_flask():
     app.run(host="0.0.0.0", port=5000, debug=False)
