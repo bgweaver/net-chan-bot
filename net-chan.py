@@ -37,33 +37,18 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Response Handling
-def load_responses(file_name):
-    if file_name:
-        with open(file_name, 'r', encoding="utf-8") as file:
-            responses = file.readlines()
-        return [response.strip() for response in responses]
-    else:
-        return ["🌸 **Net-chan Update!** 🌸"]
-
 def get_response(event_type, message):
-    response_files = {
-        "updates": './responses/update_responses.txt',
-        "backup": './responses/backup_responses.txt',
-        "sync": './responses/sync_responses.txt',
-        "unraid": './responses/unraid_responses.txt',
-        "failed": './responses/failure_responses.txt',
-        "affirmations": './responses/affirmations.txt',
-        "wake": './responses/wake_up.txt',
-        "pat": './responses/pats.txt',
-        "pat_annoyed": './responses/pat_annoyed.txt',
-        "fire": './responses/fire.txt',
-        "kuma": './responses/kuma.txt',
-    }
-    responses = load_responses(response_files.get(event_type, ''))
-    response = random.choice(responses)
+    with open('./responses.json', 'r') as f:
+        json_data = json.loads(f.read())
+    if event_type in json_data:
+        responses = json_data[event_type]
+        response = random.choice(responses)
+    else:
+        response = "🌸 **Net-chan Update!** 🌸"
     if '{message}' in response:
-        response = response.format(message=f"\n\n({message})")
+            response = response.format(message=f"\n\n({message})")
     return response.replace("\\n", "\n")
+    
 
 # Art Prompt Generation
 cute_nouns = ["kitten", "puppy", "bunny", "baby", "cloud", "star", "teddy bear", "angel", "butterfly", "kittens", "cupcake", "flower", "chick", "cookie", "birdie", "deer", "panda", "frog", "koala", "breeze", "rainbow", "daisy", "lamb", "honeybee", "squirrel", "sunflower", "pony", "smile", "snowflake", "heart", "whiskers", "pup", "glow", "sparkle", "snuggle", "giggle", "dream", "lollipop", "rose", "buttercup", "jellybean", "charm", "cuddle", "joy", "sunshine", "baby chick", "puddle", "giggle", "treasure", "snail"]
@@ -118,7 +103,7 @@ def save_last_wake_time():
 
 # Random Music Collection
 def get_song():
-    with open('./responses/music.json') as f:
+    with open('./music.json') as f:
         json_data = json.load(f)
         return(random.choice(json_data))
 
@@ -366,8 +351,6 @@ async def cheer(ctx):
     
     embed = discord.Embed(description=cheer_message, color=discord.Color.blue())
     await ctx.send(embed=embed)
-
-
 
 @bot.command()
 async def art(ctx):
