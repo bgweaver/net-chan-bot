@@ -1,5 +1,8 @@
 .env
 .delays/
+.memory/
+./memory/known_users.json
+
 
 __pycache__/
 *.pyc
