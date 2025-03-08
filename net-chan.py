@@ -15,7 +15,7 @@ import io
 from PIL import Image
 import json
 from better_profanity import profanity
-
+import re
 # ==================================================================================
 # CONSTANTS AND CONFIGURATION
 # ==================================================================================
@@ -70,8 +70,30 @@ def get_response(event_type, message):
             response = response.format(message=f"\n\n({message})")
     return response.replace("\\n", "\n")
 
+# ----------------------------------------------------------------------------------
+# Profanity Filter
+# ----------------------------------------------------------------------------------
+profanity.load_censor_words()
+
+CHAR_SUBSTITUTIONS = str.maketrans("4301$@!", "aeolsai")
+
+def normalize_text(text: str) -> str:
+    text = text.lower().translate(CHAR_SUBSTITUTIONS)
+    text = re.sub(r"[^a-z0-9\s]", "", text) 
+    text = re.sub(r"\s+", " ", text).strip() 
+    return text
+
 def naughty_naughty(input_text: str) -> bool:
-    return profanity.contains_profanity(input_text)
+    cleaned_text = normalize_text(input_text)
+
+    if profanity.contains_profanity(cleaned_text):
+        return True
+
+    spaced_out_check = re.search(r"\b([a-z])\s*([a-z])\s*([a-z])\s*([a-z])\s*([a-z])\b", cleaned_text)
+    if spaced_out_check and profanity.contains_profanity("".join(spaced_out_check.groups())):
+        return True
+
+    return False
 
 # ----------------------------------------------------------------------------------
 # User Profile Management
@@ -141,18 +163,6 @@ class ProfileModal(discord.ui.Modal, title="✨ Sign Net-chan's Book 'o Besties!
         )
 
 user_profiles = load_profiles()
-# ----------------------------------------------------------------------------------
-# Art Generation
-# ----------------------------------------------------------------------------------
-cute_nouns = ["kitten", "puppy", "bunny", "baby", "cloud", "star", "teddy bear", "angel", "butterfly", "kittens", "cupcake", "flower", "chick", "cookie", "birdie", "deer", "panda", "frog", "koala", "breeze", "rainbow", "daisy", "lamb", "honeybee", "squirrel", "sunflower", "pony", "smile", "snowflake", "heart", "whiskers", "pup", "glow", "sparkle", "snuggle", "giggle", "dream", "lollipop", "rose", "buttercup", "jellybean", "charm", "cuddle", "joy", "sunshine", "baby chick", "puddle", "giggle", "treasure", "snail"]
-cute_adjectives = ["fluffy", "sparkly", "adorable", "sweet", "charming", "gentle", "playful", "soft", "lovely", "cute", "happy", "bright", "snuggly", "fuzzy", "cheerful", "whimsical", "delightful", "tender", "shiny", "rosy", "tasty", "warm", "peppy", "breezy", "magical", "sweetheart", "fluffy", "giddy", "colorful", "lovable", "bouncy", "calm", "pretty", "cozy", "fresh", "gentle", "glowy", "smiley", "sparkling", "twin", "friendly", "graceful", "carefree", "dazzling", "snug", "dreamy", "sunny", "puffy", "jolly", "mellow"]
-cute_objects = ["heart", "balloon", "cupcake", "cookie", "star", "cloud", "socks", "teddy bear", "rainbow", "flower", "tissue box", "pillow", "blanket", "butterfly", "headband", "whisk", "paintbrush", "camera", "frame", "bookmark", "gloves", "pajamas", "purse", "necklace", "hat", "scarf", "bowtie", "sticker", "guitar", "lamp", "mug", "pencil case", "planner", "ball", "glitter", "cup", "note", "book", "bottle", "jewelry", "pen", "notepad", "sweets", "keychain", "coin", "bracelet", "flowerpot", "carpet", "diary", "mirror", "tumbler", "bottle", "lollipop", "snow globe", "painting", "clock"]
-
-def generate_art_prompt():
-    adjective = random.choice(cute_adjectives)
-    noun = random.choice(cute_nouns)
-    object_ = random.choice(cute_objects)
-    return f"a {adjective} {noun} with a {object_} in a very kawaii style"
 
 # ----------------------------------------------------------------------------------
 # Delay Management
@@ -533,7 +543,10 @@ async def cheer(ctx):
 # ----------------------------------------------------------------------------------
 @bot.command()
 async def art(ctx):
+    user_id = str(ctx.author.id)
+    profile = user_profiles.get(user_id)
     last_art_time = load_last_art_time()
+
     if last_art_time and datetime.now() - last_art_time < timedelta(hours=12):
         embed = discord.Embed(
             description="I'm too tired to make more art right now... I'm busy with other things. Maybe later? (｡•́︿•̀｡)",
@@ -543,7 +556,43 @@ async def art(ctx):
         return
 
     hf_api = os.getenv('HUGGING_FACE_API')
-    prompt = generate_art_prompt()
+   
+    if profile:
+        embed = discord.Embed(title=f"✨Yay~! {ctx.author.name}'s Profile!✨ (｡♥‿♥｡)", color=discord.Color.blue())
+        embed.add_field(name="Name", value=profile["name"], inline=False)
+
+    cute_nouns = ["kitten", "puppy", "bunny", "baby", "cloud", "star", "bear", "butterfly", "kittens", "cupcake", "flower", "chick", "cookie", "birdie", "deer", "panda", "frog", "koala", "rainbow", "daisy", "lamb", "honeybee", "squirrel", "sunflower", "pony", "snowflake", "pup", "sparkle", "dream", "lollipop", "rose", "buttercup", "jellybean", "baby chick", "puddle", "treasure", "snail"]
+    cute_adjectives = ["fluffy", "sparkly", "adorable", "sweet", "charming", "gentle", "playful", "soft", "lovely", "cute", "happy", "bright", "snuggly", "fuzzy", "cheerful", "whimsical", "delightful", "tender", "shiny", "rosy", "tasty", "warm", "peppy", "breezy", "magical", "sweetheart", "fluffy", "giddy", "colorful", "lovable", "bouncy", "calm", "pretty", "cozy", "fresh", "gentle", "glowy", "smiley", "sparkling", "twin", "friendly", "graceful", "carefree", "dazzling", "snug", "dreamy", "sunny", "puffy", "jolly", "mellow"]
+    cute_objects = ["heart", "balloon", "cupcake", "cookie", "star", "cloud", "teddy bear", "rainbow", "flower", "blanket", "butterfly", "headband", "whisk", "paintbrush", "camera", "bookmark", "gloves", "pajamas", "purse", "necklace", "hat", "scarf", "bowtie", "sticker", "guitar", "mug", "pencil case", "ball", "glitter", "cup", "note", "book", "bottle", "jewelry", "pen", "notepad", "sweets", "keychain", "coin", "bracelet", "flowerpot", "diary", "mirror", "bottle","snow globe", "painting", "clock"]
+    
+    #Customize art with user profile if available
+    if profile: 
+        if random.random() < 0.7:
+            adjective = random.choice(cute_adjectives)
+        else:
+            adjective = profile["favorite_color"]
+    else:
+        adjective = random.choice(cute_adjectives)
+   
+    if profile: 
+        if random.random() < 0.7:
+            noun = random.choice(cute_nouns)
+        else:  
+            noun = profile["favorite_animal"]
+    else:
+        noun = random.choice(cute_nouns)
+    
+    if profile: 
+        if random.random() < 0.7:
+            object_ = random.choice(cute_objects)
+        else:  
+            object_ = profile["favorite_food"]
+    else:
+        object_ = random.choice(cute_objects)
+    
+    
+    prompt = f"a {adjective} {noun} with a {object_} in a very kawaii style"
+    
     print(prompt)
 
     working_embed = discord.Embed(
@@ -571,7 +620,7 @@ async def art(ctx):
             image_file.seek(0)
 
             art_embed = discord.Embed(
-                title="Here's your cute art! (｡♥‿♥｡)",
+                title=f"Here's your cute art, {ctx.author.name}! (｡♥‿♥｡)",
                 color=discord.Color.purple()
             )
             file = discord.File(image_file, filename="cute_art.png")
