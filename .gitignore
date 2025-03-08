@@ -1,7 +1,5 @@
 .env
-.delays/
-.memory/
-./memory/known_users.json
+memory/
 
 
 __pycache__/
