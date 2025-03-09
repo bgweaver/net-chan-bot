@@ -16,6 +16,7 @@ from PIL import Image
 import json
 from better_profanity import profanity
 import re
+import base64
 # ==================================================================================
 # CONSTANTS AND CONFIGURATION
 # ==================================================================================
@@ -38,6 +39,7 @@ last_response_time_lock = asyncio.Lock()
 last_wake_message_time = None
 wake_message_lock = asyncio.Lock()
 praise_counter = 1
+art_count = 0
 webhook_log = []
 MAX_LOG_SIZE = 100
 
@@ -214,6 +216,15 @@ def save_last_wake_time():
             json.dump({}, file)
     save_delay_time(WAKE_DELAY_FILE)
     print(f"Saved last_wake_message_time to file.")
+
+def is_new_day(last_timestamp):
+    if not last_timestamp:
+        return True
+    
+    last_date = last_timestamp.date()
+    current_date = datetime.now().date()
+    
+    return current_date > last_date
 
 # ----------------------------------------------------------------------------------
 # Music Handling
@@ -543,11 +554,18 @@ async def cheer(ctx):
 # ----------------------------------------------------------------------------------
 @bot.command()
 async def art(ctx):
+    global art_count
+    art_left = 5-art_count
     user_id = str(ctx.author.id)
     profile = user_profiles.get(user_id)
     last_art_time = load_last_art_time()
 
-    if last_art_time and datetime.now() - last_art_time < timedelta(hours=12):
+    if is_new_day(last_art_time):
+        art_count = 0
+        save_last_art_time()
+
+
+    if art_count > 6:
         embed = discord.Embed(
             description="I'm too tired to make more art right now... I'm busy with other things. Maybe later? (｡•́︿•̀｡)",
             color=discord.Color.red()
@@ -555,7 +573,7 @@ async def art(ctx):
         await ctx.send(embed=embed)
         return
 
-    hf_api = os.getenv('HUGGING_FACE_API')
+    v_api = os.getenv('VENICE_API')
    
     if profile:
         embed = discord.Embed(title=f"✨Yay~! {ctx.author.name}'s Profile!✨ (｡♥‿♥｡)", color=discord.Color.blue())
@@ -602,10 +620,31 @@ async def art(ctx):
     working_message = await ctx.send(embed=working_embed)
 
     try:
-        API_URL = "https://api-inference.huggingface.co/models/black-forest-labs/FLUX.1-dev"
-        headers = {"Authorization": f"Bearer {hf_api}"}
-        response = requests.post(API_URL, headers=headers, json={"inputs": prompt})
+        url = "https://api.venice.ai/api/v1/image/generate"
+        payload = {
+            "model": "flux-dev",
+            "prompt": prompt,
+            "style_preset": "Anime",
+            "height": 600,
+            "width": 600,
+            "steps": 20,
+            "cfg_scale": 7.5,
+            "seed": 123456789,
+            "lora_strength": 50,
+            "safe_mode": True,
+            "return_binary": False,
+            "hide_watermark": True,
+            "format": "webp",
+            "embed_exif_metadata": False,
+        }
+        headers = {
+            "Authorization": f"Bearer {v_api}",
+            "Content-Type": "application/json"
+        }
 
+        # Make the API request
+        response = requests.request("POST", url, json=payload, headers=headers)
+        
         if response.status_code != 200:
             error_embed = discord.Embed(
                 description="Oopsie, there was an issue fetching the art... (｡•́︿•̀｡)",
@@ -614,22 +653,38 @@ async def art(ctx):
             await working_message.edit(embed=error_embed)
             return
 
-        image = Image.open(io.BytesIO(response.content))
-        with io.BytesIO() as image_file:
-            image.save(image_file, format="PNG")
-            image_file.seek(0)
-
-            art_embed = discord.Embed(
-                title=f"Here's your cute art, {ctx.author.name}! (｡♥‿♥｡)",
-                color=discord.Color.purple()
-            )
-            file = discord.File(image_file, filename="cute_art.png")
-            art_embed.set_image(url="attachment://cute_art.png")
-
-            await working_message.edit(embed=art_embed)
-            await ctx.send(file=file)
-
-        save_last_art_time()
+        # Parse the JSON response
+        response_data = response.json()
+        
+        # Extract the image data from the 'images' array
+        if "images" in response_data and response_data["images"]:
+            # The first image in the array contains the base64 data
+            base64_data = response_data["images"][0]
+            
+            # Decode the base64 data
+            image_data = base64.b64decode(base64_data)
+            
+            # Open the image from the decoded data
+            image = Image.open(io.BytesIO(image_data))
+            
+            # Continue with saving and sending the image
+            with io.BytesIO() as image_file:
+                image.save(image_file, format="PNG")
+                image_file.seek(0)
+                
+                art_embed = discord.Embed(
+                    title=f"Here's your cute art, {ctx.author.name}! (｡♥‿♥｡)\nI can make {art_left} more pieces today!",
+                    color=discord.Color.purple()
+                )
+                file = discord.File(image_file, filename="cute_art.png")
+                art_embed.set_image(url="attachment://cute_art.png")
+                
+                await working_message.edit(embed=art_embed)
+                await ctx.send(file=file)
+                art_count +=1
+        else:
+            raise ValueError("No images found in the response")
+            
     except Exception as e:
         error_embed = discord.Embed(
             description="I don't feel like doing art right now... 😔",
@@ -637,7 +692,8 @@ async def art(ctx):
         )
         await working_message.edit(embed=error_embed)
         print(f"Error occurred: {e}")
-
+        import traceback
+        traceback.print_exc()
 # ----------------------------------------------------------------------------------
 # Music Command
 # ----------------------------------------------------------------------------------
