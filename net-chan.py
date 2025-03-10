@@ -555,7 +555,7 @@ async def cheer(ctx):
 @bot.command()
 async def art(ctx):
     global art_count
-    art_left = 5-art_count
+    art_left = 6-art_count
     user_id = str(ctx.author.id)
     profile = user_profiles.get(user_id)
     last_art_time = load_last_art_time()
